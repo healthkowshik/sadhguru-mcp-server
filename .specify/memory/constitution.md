@@ -1,24 +1,20 @@
 <!--
   Sync Impact Report
   ===================
-  Version change: (none) → 1.0.0
-  Modified principles: N/A (initial ratification)
-  Added sections:
-    - Core Principles (4): Content Fidelity, MCP-First Design,
-      Test-First, Simplicity
-    - Technology Stack
-    - Development Workflow
-    - Governance
-  Removed sections: N/A
+  Version change: 1.0.0 → 1.0.1
+  Modified principles: none
+  Added sections: none
+  Removed sections: none
+  Changed:
+    - Technology Stack: Package Management changed from
+      "uv (preferred) or pip" to "uv (Astral)" as sole tool.
+      Added "uv run pytest" convention. Clarified Astral-only
+      toolchain (uv + ruff).
   Templates requiring updates:
     - .specify/templates/plan-template.md ✅ no update needed
-      (Constitution Check section is dynamically filled)
     - .specify/templates/spec-template.md ✅ no update needed
-      (generic structure compatible with all 4 principles)
     - .specify/templates/tasks-template.md ✅ no update needed
-      (task categorization is generic, filled at generation time)
     - .claude/commands/*.md ✅ no update needed
-      (no outdated agent-specific names found in generic guidance)
   Follow-up TODOs: none
 -->
 
@@ -91,11 +87,15 @@ Every abstraction incurs maintenance cost that must be justified.
 
 - **Language**: Python 3.11+
 - **MCP Framework**: FastMCP 3.0
-- **Testing**: pytest
-- **Linting/Formatting**: ruff
-- **Package Management**: uv (preferred) or pip
+- **Testing**: pytest (via `uv run pytest`)
+- **Linting/Formatting**: ruff (Astral)
+- **Package Management**: uv (Astral)
 
-All dependencies MUST be pinned in a lockfile. New dependencies
+The project MUST use Astral tooling exclusively: uv for package
+management and task running, ruff for linting and formatting.
+pip, setuptools, and other legacy tools MUST NOT be used.
+
+All dependencies MUST be pinned in `uv.lock`. New dependencies
 MUST be justified against the Simplicity principle before adoption.
 
 ## Development Workflow
@@ -124,4 +124,4 @@ decisions. It supersedes all other practices when conflicts arise.
   pass a constitution check before implementation begins.
   The `/speckit.analyze` command flags violations as CRITICAL.
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-24 | **Last Amended**: 2026-02-24
+**Version**: 1.0.1 | **Ratified**: 2026-02-24 | **Last Amended**: 2026-02-24
