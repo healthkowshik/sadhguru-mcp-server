@@ -15,10 +15,9 @@ the duration of the day to avoid redundant requests."
 
 ### User Story 1 - Get Today's Quote (Priority: P1)
 
-An AI assistant asks for today's Sadhguru daily quote. The MCP client
-reads the `sadhguru://daily-quote/today` resource and receives the
-quote text along with the source URL. The assistant can then present the
-quote to the end user with proper attribution.
+A client requests today's Sadhguru daily quote by reading the
+`sadhguru://daily-quote/today` resource and receives the quote text
+along with the source URL for proper attribution.
 
 **Why this priority**: This is the primary use case. Most consumers want
 "today's wisdom" without needing to know or construct a date string.
@@ -42,8 +41,8 @@ isha.sadhguru.org.
 
 ### User Story 2 - Get Quote by Date (Priority: P2)
 
-An AI assistant requests a Sadhguru quote for a specific date — for
-example, a user's birthday or a memorable occasion. The client reads
+A client requests a Sadhguru quote for a specific date — for example,
+a user's birthday or a memorable occasion. The client reads
 `sadhguru://daily-quote/february-22-2026` and receives that day's quote
 with source attribution.
 
@@ -68,8 +67,8 @@ quote matches the content at the corresponding source URL.
 
 ### User Story 3 - Graceful Error on Unavailable Date (Priority: P3)
 
-An AI assistant requests a quote for a date that has no content — for
-example, a future date not yet published or a malformed date string.
+A client requests a quote for a date that has no content — for example,
+a future date not yet published or a malformed date string.
 The system returns a clear error message rather than crashing or
 returning empty content.
 
@@ -134,7 +133,9 @@ verifying a descriptive error is returned.
 ### Key Entities
 
 - **DailyQuote**: A single Sadhguru quote for a specific date.
-  Attributes: quote text, date, source URL.
+  Attributes: `quote` (the exact quote text), `date` (the date string
+  in month-day-year format), `source_url` (full URL to the source page).
+  Returned as a structured object with these three separate fields.
 
 ## Success Criteria *(mandatory)*
 
@@ -149,6 +150,23 @@ verifying a descriptive error is returned.
 - **SC-004**: 100% of requests for invalid or unavailable dates return
   a descriptive error message (never an empty or malformed response).
 
+## Clarifications
+
+### Session 2026-02-24
+
+- Q: Should user stories say "AI assistant" or use a more inclusive term? → A: Use "client" — neutral MCP term covering both AI and human consumers.
+- Q: Should the response be plain text, structured fields, or markdown? → A: Structured object with separate `quote`, `date`, and `source_url` fields.
+- Q: Should the system rate-limit requests to the upstream source? → A: No — per-date caching is sufficient protection.
+- Q: Should the resource support multiple languages? → A: English only. Multi-language deferred to a future feature.
+- Q: Should cache persist across server restarts? → A: No — in-memory only.
+
+## Out of Scope
+
+- Multi-language quote support (source offers 15+ languages; deferred
+  to a future feature).
+- Rate limiting or throttling of upstream fetches beyond per-date
+  caching.
+
 ## Assumptions
 
 - The source URL pattern
@@ -158,3 +176,5 @@ verifying a descriptive error is returned.
 - The date format uses lowercase full month names (e.g., "february"
   not "February" or "feb").
 - "Today" is determined by the server's local timezone.
+- Cache is in-memory only; a server restart clears the cache and
+  subsequent requests re-fetch from the source.
