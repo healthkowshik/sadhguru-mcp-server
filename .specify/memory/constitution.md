@@ -1,50 +1,127 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+  Sync Impact Report
+  ===================
+  Version change: (none) → 1.0.0
+  Modified principles: N/A (initial ratification)
+  Added sections:
+    - Core Principles (4): Content Fidelity, MCP-First Design,
+      Test-First, Simplicity
+    - Technology Stack
+    - Development Workflow
+    - Governance
+  Removed sections: N/A
+  Templates requiring updates:
+    - .specify/templates/plan-template.md ✅ no update needed
+      (Constitution Check section is dynamically filled)
+    - .specify/templates/spec-template.md ✅ no update needed
+      (generic structure compatible with all 4 principles)
+    - .specify/templates/tasks-template.md ✅ no update needed
+      (task categorization is generic, filled at generation time)
+    - .claude/commands/*.md ✅ no update needed
+      (no outdated agent-specific names found in generic guidance)
+  Follow-up TODOs: none
+-->
+
+# Sadhguru MCP Server Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Content Fidelity
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Sadhguru's words MUST be presented accurately. No paraphrasing,
+no fabrication, no attribution of unsourced content.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- All quotes MUST be traceable to a verifiable source (video,
+  book, article, or official Isha Foundation publication).
+- The system MUST NOT generate, interpolate, or rephrase
+  Sadhguru's teachings. It serves existing content only.
+- When a source cannot be verified, the system MUST clearly
+  indicate the content is unverified rather than present it
+  as authoritative.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: Misrepresenting a spiritual teacher's words causes
+real harm. Accuracy is the foundational value of this project.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. MCP-First Design
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Every feature MUST be exposed as an MCP tool or resource.
+Standard MCP protocol compliance is non-negotiable.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- All functionality MUST be accessible through the MCP protocol;
+  no side-channel APIs or direct database access for consumers.
+- Tool and resource schemas MUST follow MCP specification
+  conventions (typed parameters, structured responses).
+- The server MUST work with any MCP-compatible client without
+  client-specific workarounds.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale**: The project exists to serve AI assistants via MCP.
+Protocol compliance ensures interoperability and composability.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Test-First (NON-NEGOTIABLE)
+
+TDD is mandatory: tests MUST be written and failing before
+implementation. Red-Green-Refactor cycle strictly enforced.
+
+- No production code MUST be written without a corresponding
+  failing test first.
+- Tests MUST cover MCP tool inputs/outputs (contract tests),
+  content retrieval accuracy, and error paths.
+- Test names MUST describe the behavior being verified, not
+  the implementation detail.
+
+**Rationale**: An MCP server handling spiritual content has zero
+tolerance for silent regressions. Tests are the safety net.
+
+### IV. Simplicity (YAGNI)
+
+Start simple. Avoid premature abstractions. Only build what is
+immediately needed.
+
+- No feature MUST be added speculatively; every addition MUST
+  address a concrete, current requirement.
+- Prefer flat structures over deep hierarchies. Prefer functions
+  over classes when state is not needed.
+- Configuration MUST have sensible defaults; optional complexity
+  MUST NOT burden the common path.
+
+**Rationale**: Complexity is the primary risk for a small project.
+Every abstraction incurs maintenance cost that must be justified.
+
+## Technology Stack
+
+- **Language**: Python 3.11+
+- **MCP Framework**: FastMCP 3.0
+- **Testing**: pytest
+- **Linting/Formatting**: ruff
+- **Package Management**: uv (preferred) or pip
+
+All dependencies MUST be pinned in a lockfile. New dependencies
+MUST be justified against the Simplicity principle before adoption.
+
+## Development Workflow
+
+- Feature work MUST follow the speckit workflow: specify, plan,
+  tasks, implement.
+- Every MCP tool/resource MUST have contract tests validating
+  its schema and behavior before implementation begins.
+- Commits MUST be atomic and correspond to a single logical
+  change.
+- Content data (quotes, sources) MUST be stored separately from
+  application logic to enable independent updates.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution is the authoritative source for project
+decisions. It supersedes all other practices when conflicts arise.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- **Amendments**: Any change to this constitution MUST be
+  documented with rationale, versioned, and reflected in a
+  Sync Impact Report at the top of this file.
+- **Versioning**: MAJOR for principle removals or redefinitions,
+  MINOR for new principles or material expansions, PATCH for
+  clarifications and wording fixes.
+- **Compliance**: All feature specs, plans, and task lists MUST
+  pass a constitution check before implementation begins.
+  The `/speckit.analyze` command flags violations as CRITICAL.
+
+**Version**: 1.0.0 | **Ratified**: 2026-02-24 | **Last Amended**: 2026-02-24
