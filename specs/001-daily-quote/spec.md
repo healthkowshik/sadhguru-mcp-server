@@ -116,6 +116,11 @@ verifying a descriptive error is returned.
   `sadhguru://daily-quote/{date}` where `{date}` follows ISO 8601
   format `yyyy-mm-dd` (e.g., `2026-02-22`). The server internally
   converts to the source website's format for fetching.
+- **FR-001a**: System MUST expose a `get_daily_quote` MCP tool with
+  an optional `date` parameter (ISO 8601, defaults to today).
+  MCP resources are application-controlled and not auto-discoverable
+  by models; the tool provides model-controlled access to the same
+  functionality, ensuring cross-client compatibility.
 - **FR-002**: System MUST expose a convenience resource at
   `sadhguru://daily-quote/today` that resolves to the current
   calendar date.
@@ -163,6 +168,13 @@ verifying a descriptive error is returned.
 - Q: Should the system rate-limit requests to the upstream source? → A: No — per-date caching is sufficient protection.
 - Q: Should the resource support multiple languages? → A: English only. Multi-language deferred to a future feature.
 - Q: Should cache persist across server restarts? → A: No — in-memory only.
+- Q: Why expose a tool in addition to resources? → A: MCP resources are
+  application-controlled (the client app decides when to attach them).
+  Most MCP clients (Claude Desktop, VS Code, Cursor) only let the model
+  autonomously invoke tools, not resources. A `get_daily_quote` tool
+  ensures the model can discover and use the server without manual user
+  intervention. The tool shares the same scraper/cache logic as the
+  resources.
 
 ## Out of Scope
 

@@ -4,6 +4,12 @@
 
 An MCP server that serves Sadhguru's daily quotes from [isha.sadhguru.org](https://isha.sadhguru.org/en/wisdom/quotes).
 
+## Tool
+
+| Tool | Description |
+|---|---|
+| `get_daily_quote` | Get Sadhguru's daily quote. Pass an ISO 8601 date (e.g. `2026-02-24`) or omit for today. |
+
 ## Resources
 
 | Resource URI | Description |
@@ -11,7 +17,7 @@ An MCP server that serves Sadhguru's daily quotes from [isha.sadhguru.org](https
 | `sadhguru://daily-quote/today` | Today's quote |
 | `sadhguru://daily-quote/{date}` | Quote for a specific date (ISO 8601: `yyyy-mm-dd`) |
 
-Both resources return JSON with three fields:
+The tool and resources return JSON with three fields:
 
 ```json
 {

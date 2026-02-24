@@ -232,3 +232,43 @@ class TestUnavailableDate:
             async with Client(mcp) as client:
                 with pytest.raises(McpError, match="[Nn]o quote"):
                     await client.read_resource("sadhguru://daily-quote/2030-01-01")
+
+
+# ──────────────────────────────────────────────────────────
+# Tool: get_daily_quote
+# ──────────────────────────────────────────────────────────
+
+
+class TestGetDailyQuoteTool:
+    """Contract tests for the get_daily_quote tool."""
+
+    @pytest.mark.asyncio
+    async def test_tool_returns_todays_quote(self, sample_quote):
+        """Tool with no date arg returns today's quote."""
+        with patch(
+            FETCH_QUOTE,
+            new_callable=AsyncMock,
+            return_value=sample_quote,
+        ):
+            async with Client(mcp) as client:
+                result = await client.call_tool("get_daily_quote", {})
+                data = json.loads(result.content[0].text)
+                assert data["date"] == date.today().isoformat()
+                assert data["quote"]
+
+    @pytest.mark.asyncio
+    async def test_tool_returns_quote_for_specific_date(self, sample_quote_for_date):
+        """Tool with a date arg returns that date's quote."""
+        with patch(
+            FETCH_QUOTE,
+            new_callable=AsyncMock,
+            return_value=sample_quote_for_date,
+        ):
+            async with Client(mcp) as client:
+                result = await client.call_tool(
+                    "get_daily_quote",
+                    {"date": "2026-02-22"},
+                )
+                data = json.loads(result.content[0].text)
+                assert data["date"] == "2026-02-22"
+                assert data["quote"]

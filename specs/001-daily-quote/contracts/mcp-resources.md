@@ -1,6 +1,34 @@
-# MCP Resource Contracts: Daily Quote
+# MCP Contracts: Daily Quote
 
 **Date**: 2026-02-24 | **Branch**: `001-daily-quote`
+
+## Tool: `get_daily_quote`
+
+**Type**: Tool (model-controlled, auto-discoverable by LLMs)
+**Description**: Get Sadhguru's daily quote.
+
+### Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `date` | `str` | No | Today's date | ISO 8601 date (e.g., `2026-02-24`) |
+
+### Response
+
+Same JSON schema as the resource responses below. The tool shares
+the same scraper/cache logic as both resources.
+
+### Rationale
+
+MCP resources are *application-controlled* — the client application
+decides when to attach them, and the model cannot invoke them
+autonomously. Most MCP clients (Claude Desktop, VS Code/Copilot,
+Cursor) only let the model auto-discover and invoke tools. The
+`get_daily_quote` tool provides model-controlled access to the same
+quote functionality, ensuring the server works across all clients
+without requiring manual resource attachment.
+
+---
 
 ## Resource Template: `sadhguru://daily-quote/{date}`
 

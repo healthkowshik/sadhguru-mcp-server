@@ -51,6 +51,19 @@ async def get_quote_by_date(date: str) -> str:
     return await _get_quote_json(date)
 
 
+@mcp.tool()
+async def get_daily_quote(date: str = "") -> str:
+    """Get Sadhguru's daily quote.
+
+    Args:
+        date: ISO 8601 date (e.g. 2026-02-24). Defaults to today.
+    """
+    if not date:
+        date = date_module.today().isoformat()
+    _validate_iso_date(date)
+    return await _get_quote_json(date)
+
+
 def _validate_iso_date(iso_date: str) -> None:
     """Validate that the given string is a valid ISO 8601 date (yyyy-mm-dd)."""
     try:

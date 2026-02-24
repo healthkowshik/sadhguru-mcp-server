@@ -76,28 +76,40 @@ persistent across restarts, which matches the spec requirement.
   date marker that clears the entire cache on day rollover is simpler
   and correct since old-day entries are stale anyway.
 
-## Decision 5: FastMCP Resource Registration
+## Decision 5: FastMCP Tool & Resource Registration
 
-**Decision**: Two `@mcp.resource()` registrations — one resource template
-and one fixed resource. The `{date}` parameter accepts ISO 8601 format;
-the handler converts to the source website's format internally.
+**Decision**: One `@mcp.tool()` and two `@mcp.resource()` registrations,
+all sharing the same scraper/cache logic.
 
 ```python
+@mcp.tool()
+async def get_daily_quote(date: str = "") -> str:
+    """Get Sadhguru's daily quote."""
+    # date is ISO 8601 (e.g., "2026-02-22"), defaults to today
+    ...
+
 @mcp.resource("sadhguru://daily-quote/{date}", mime_type="application/json")
-async def get_daily_quote(date: str) -> str:
-    # date is ISO 8601 (e.g., "2026-02-22")
-    # Convert to source format (e.g., "february-22-2026") for fetching
+async def get_quote_by_date(date: str) -> str:
     ...
 
 @mcp.resource("sadhguru://daily-quote/today", mime_type="application/json")
 async def get_todays_quote() -> str:
-    # Resolve today as ISO 8601 via datetime.date.today().isoformat()
     ...
 ```
 
-**Rationale**: FastMCP distinguishes templates (with `{param}` in URI)
-from fixed resources (concrete URI) automatically. Both use the same
-decorator. The `today` resource is registered as a fixed resource and
+**Rationale**: MCP resources are *application-controlled* — the client
+application decides when to attach them, and the model cannot discover
+or invoke them autonomously. Most MCP clients (Claude Desktop,
+VS Code/Copilot, Cursor) only let the model auto-discover tools.
+A server with only resources appears invisible to the model.
+
+The `get_daily_quote` tool provides model-controlled access to the same
+functionality, ensuring cross-client compatibility. The resources remain
+for clients that support application-controlled attachment (e.g.,
+Claude Code `@`-mentions, MCP Inspector manual triggers).
+
+FastMCP distinguishes templates (with `{param}` in URI) from fixed
+resources (concrete URI) automatically. The `today` resource is
 matched before the template, so there is no routing conflict.
 
 Return type is `str` with `json.dumps()` and `mime_type="application/json"`.
