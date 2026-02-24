@@ -19,10 +19,10 @@
 
 **Purpose**: Project initialization, dependency installation, directory structure
 
-- [ ] T001 Create `pyproject.toml` with project metadata, Python 3.11+ requirement, and dependencies (fastmcp>=3.0, httpx>=0.27, beautifulsoup4>=4.12) plus dev dependencies (pytest, ruff) using uv-compatible configuration in `pyproject.toml`
-- [ ] T002 Create source package directory structure: `src/sadhguru_mcp_server/__init__.py`
-- [ ] T003 Create test directory structure: `tests/__init__.py`, `tests/contract/__init__.py`, `tests/unit/__init__.py`, `tests/integration/__init__.py`
-- [ ] T004 Run `uv sync` to generate `uv.lock` and install all dependencies
+- [x] T001 Create `pyproject.toml` with project metadata, Python 3.11+ requirement, and dependencies (fastmcp>=3.0, httpx>=0.27, beautifulsoup4>=4.12) plus dev dependencies (pytest, ruff) using uv-compatible configuration in `pyproject.toml`
+- [x] T002 Create source package directory structure: `src/sadhguru_mcp_server/__init__.py`
+- [x] T003 Create test directory structure: `tests/__init__.py`, `tests/contract/__init__.py`, `tests/unit/__init__.py`, `tests/integration/__init__.py`
+- [x] T004 Run `uv sync` to generate `uv.lock` and install all dependencies
 
 ---
 
@@ -34,14 +34,14 @@
 
 ### Cache Module
 
-- [ ] T005 [P] Write failing unit tests for QuoteCache (`get`, `set`, midnight expiry) in `tests/unit/test_cache.py`
-- [ ] T006 Implement QuoteCache dataclass with lazy midnight expiry in `src/sadhguru_mcp_server/cache.py`
+- [x] T005 [P] Write failing unit tests for QuoteCache (`get`, `set`, midnight expiry) in `tests/unit/test_cache.py`
+- [x] T006 Implement QuoteCache dataclass with lazy midnight expiry in `src/sadhguru_mcp_server/cache.py`
 
 ### Scraper Module
 
-- [ ] T007 [P] Create shared test fixtures (mock `__NEXT_DATA__` HTML response, mock 404 response) in `tests/conftest.py`
-- [ ] T008 [P] Write failing unit tests for `fetch_quote` (parse `__NEXT_DATA__` JSON, extract quote text, build DailyQuote) in `tests/unit/test_scraper.py`
-- [ ] T009 Implement `fetch_quote` async function: HTTP GET with httpx, parse `__NEXT_DATA__` via beautifulsoup4, extract `summary[0].value`, return DailyQuote dict in `src/sadhguru_mcp_server/scraper.py`
+- [x] T007 [P] Create shared test fixtures (mock `__NEXT_DATA__` HTML response, mock 404 response) in `tests/conftest.py`
+- [x] T008 [P] Write failing unit tests for `fetch_quote` (parse `__NEXT_DATA__` JSON, extract quote text, build DailyQuote) in `tests/unit/test_scraper.py`
+- [x] T009 Implement `fetch_quote` async function: HTTP GET with httpx, parse `__NEXT_DATA__` via beautifulsoup4, extract `summary[0].value`, return DailyQuote dict in `src/sadhguru_mcp_server/scraper.py`
 
 **Checkpoint**: Cache and scraper modules are independently tested. No MCP resources registered yet.
 
@@ -57,13 +57,13 @@
 
 > **Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [US1] Write failing contract tests for `sadhguru://daily-quote/today` resource in `tests/contract/test_daily_quote_resource.py`: response schema has `quote`, `date`, `source_url` fields (all non-empty strings); `date` matches today; `source_url` matches `https://isha.sadhguru.org/en/wisdom/quotes/date/{date}`; second read returns identical content (idempotency/caching)
+- [x] T010 [US1] Write failing contract tests for `sadhguru://daily-quote/today` resource in `tests/contract/test_daily_quote_resource.py`: response schema has `quote`, `date`, `source_url` fields (all non-empty strings); `date` matches today; `source_url` matches `https://isha.sadhguru.org/en/wisdom/quotes/date/{date}`; second read returns identical content (idempotency/caching)
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Create FastMCP server instance and register `sadhguru://daily-quote/today` fixed resource (resolves today's date, checks cache, calls scraper on miss, returns JSON via `json.dumps`) in `src/sadhguru_mcp_server/server.py`
-- [ ] T012 [US1] Create entry point that runs the MCP server in `src/sadhguru_mcp_server/__main__.py`
-- [ ] T013 [US1] Verify contract tests pass (GREEN) — run `uv run pytest tests/contract/test_daily_quote_resource.py`
+- [x] T011 [US1] Create FastMCP server instance and register `sadhguru://daily-quote/today` fixed resource (resolves today's date, checks cache, calls scraper on miss, returns JSON via `json.dumps`) in `src/sadhguru_mcp_server/server.py`
+- [x] T012 [US1] Create entry point that runs the MCP server in `src/sadhguru_mcp_server/__main__.py`
+- [x] T013 [US1] Verify contract tests pass (GREEN) — run `uv run pytest tests/contract/test_daily_quote_resource.py`
 
 **Checkpoint**: `sadhguru://daily-quote/today` is fully functional. MVP deliverable.
 
@@ -79,13 +79,13 @@
 
 > **Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T014 [US2] Write failing contract tests for `sadhguru://daily-quote/{date}` resource template in `tests/contract/test_daily_quote_resource.py`: response schema for a specific date; `date` field matches requested date; `source_url` is correct; cached response matches first response
+- [x] T014 [US2] Write failing contract tests for `sadhguru://daily-quote/{date}` resource template in `tests/contract/test_daily_quote_resource.py`: response schema for a specific date; `date` field matches requested date; `source_url` is correct; cached response matches first response
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement date validation and ISO-to-source conversion function (validate ISO 8601 `yyyy-mm-dd` via `datetime.date.fromisoformat()`, convert to source format `month-day-year` e.g. `2026-02-22` → `february-22-2026`) in `src/sadhguru_mcp_server/scraper.py`
-- [ ] T016 [US2] Register `sadhguru://daily-quote/{date}` resource template (accepts ISO 8601 date, validates, converts to source format, checks cache, calls scraper on miss, returns JSON with ISO date) in `src/sadhguru_mcp_server/server.py`
-- [ ] T017 [US2] Verify contract tests pass (GREEN) — run `uv run pytest tests/contract/test_daily_quote_resource.py`
+- [x] T015 [US2] Implement date validation and ISO-to-source conversion function (validate ISO 8601 `yyyy-mm-dd` via `datetime.date.fromisoformat()`, convert to source format `month-day-year` e.g. `2026-02-22` → `february-22-2026`) in `src/sadhguru_mcp_server/scraper.py`
+- [x] T016 [US2] Register `sadhguru://daily-quote/{date}` resource template (accepts ISO 8601 date, validates, converts to source format, checks cache, calls scraper on miss, returns JSON with ISO date) in `src/sadhguru_mcp_server/server.py`
+- [x] T017 [US2] Verify contract tests pass (GREEN) — run `uv run pytest tests/contract/test_daily_quote_resource.py`
 
 **Checkpoint**: Both `today` and `{date}` resources are functional. Clients can fetch any valid date.
 
@@ -101,16 +101,16 @@
 
 > **Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T018 [P] [US3] Write failing tests for invalid date format error (e.g., `not-a-date`, `22-02-2026`) — must return error mentioning expected ISO 8601 format — in `tests/contract/test_daily_quote_resource.py`
-- [ ] T019 [P] [US3] Write failing tests for unavailable date error (e.g., `2030-01-01`) — must return error indicating no quote available — in `tests/contract/test_daily_quote_resource.py`
-- [ ] T020 [P] [US3] Write failing tests for upstream errors (network timeout, connection refused) — must return error indicating upstream unavailable — in `tests/unit/test_scraper.py`
+- [x] T018 [P] [US3] Write failing tests for invalid date format error (e.g., `not-a-date`, `22-02-2026`) — must return error mentioning expected ISO 8601 format — in `tests/contract/test_daily_quote_resource.py`
+- [x] T019 [P] [US3] Write failing tests for unavailable date error (e.g., `2030-01-01`) — must return error indicating no quote available — in `tests/contract/test_daily_quote_resource.py`
+- [x] T020 [P] [US3] Write failing tests for upstream errors (network timeout, connection refused) — must return error indicating upstream unavailable — in `tests/unit/test_scraper.py`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Implement error handling for invalid date format: raise descriptive error with expected ISO 8601 format hint in `src/sadhguru_mcp_server/scraper.py`
-- [ ] T022 [US3] Implement error handling for HTTP 404 (no quote for date) and missing quote in parsed HTML in `src/sadhguru_mcp_server/scraper.py`
-- [ ] T023 [US3] Implement error handling for upstream network errors (httpx.ConnectError, httpx.TimeoutException) in `src/sadhguru_mcp_server/scraper.py`
-- [ ] T024 [US3] Verify all error-path tests pass (GREEN) — run `uv run pytest tests/contract/ tests/unit/`
+- [x] T021 [US3] Implement error handling for invalid date format: raise descriptive error with expected ISO 8601 format hint in `src/sadhguru_mcp_server/scraper.py`
+- [x] T022 [US3] Implement error handling for HTTP 404 (no quote for date) and missing quote in parsed HTML in `src/sadhguru_mcp_server/scraper.py`
+- [x] T023 [US3] Implement error handling for upstream network errors (httpx.ConnectError, httpx.TimeoutException) in `src/sadhguru_mcp_server/scraper.py`
+- [x] T024 [US3] Verify all error-path tests pass (GREEN) — run `uv run pytest tests/contract/ tests/unit/`
 
 **Checkpoint**: All three user stories are complete. Every error path returns a descriptive message.
 
@@ -120,9 +120,9 @@
 
 **Purpose**: Final validation across all stories
 
-- [ ] T025 [P] Run full test suite and verify all tests pass — `uv run pytest`
-- [ ] T026 [P] Run linter and formatter — `uv run ruff check . && uv run ruff format --check .`
-- [ ] T027 Validate quickstart.md by following setup instructions on a clean environment
+- [x] T025 [P] Run full test suite and verify all tests pass — `uv run pytest`
+- [x] T026 [P] Run linter and formatter — `uv run ruff check . && uv run ruff format --check .`
+- [x] T027 Validate quickstart.md by following setup instructions on a clean environment
 
 ---
 
