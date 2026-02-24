@@ -12,14 +12,14 @@
 
 | Parameter | Type | Format | Example |
 |-----------|------|--------|---------|
-| `date` | `str` | `month-day-year` (lowercase full month, unpadded day, 4-digit year) | `february-22-2026` |
+| `date` | `str` | ISO 8601 `yyyy-mm-dd` | `2026-02-22` |
 
 ### Success Response (200)
 
 ```json
 {
   "quote": "Meditation is not a conquest or achievement – it is a homecoming.",
-  "date": "february-22-2026",
+  "date": "2026-02-22",
   "source_url": "https://isha.sadhguru.org/en/wisdom/quotes/date/february-22-2026"
 }
 ```
@@ -27,18 +27,18 @@
 | Field | Type | Description |
 |-------|------|-------------|
 | `quote` | `string` | Exact quote text from the source page |
-| `date` | `string` | The requested date in `month-day-year` format |
-| `source_url` | `string` | Full URL to the source page for attribution |
+| `date` | `string` | The requested date in ISO 8601 format (`yyyy-mm-dd`) |
+| `source_url` | `string` | Full URL to the source page for attribution (uses source website's date format) |
 
 ### Error Responses
 
-**Invalid date format** (e.g., `not-a-date`, `02-22-2026`):
+**Invalid date format** (e.g., `not-a-date`, `22-02-2026`):
 - Error with message describing the expected format:
-  `"Invalid date format: 'not-a-date'. Expected format: month-day-year (e.g., february-22-2026)"`
+  `"Invalid date format: 'not-a-date'. Expected format: yyyy-mm-dd (e.g., 2026-02-22)"`
 
 **No quote available** (e.g., future date, date with no published content):
 - Error with message:
-  `"No quote available for date: january-01-2030"`
+  `"No quote available for date: 2030-01-01"`
 
 **Upstream unreachable** (network error, timeout):
 - Error with message:
@@ -86,9 +86,9 @@ Tests MUST verify:
    fields, all non-empty strings.
 2. **Idempotency**: Two reads of the same date return identical content.
 3. **Today resolution**: `sadhguru://daily-quote/today` returns a
-   response with `date` matching today's date.
-4. **Invalid format error**: Invalid date strings produce a descriptive
-   error mentioning the expected format.
+   response with `date` matching today's date in ISO 8601 format.
+4. **Invalid format error**: Non-ISO-8601 date strings produce a
+   descriptive error mentioning the expected format (`yyyy-mm-dd`).
 5. **Unavailable date error**: Dates with no content produce a
    descriptive error.
 6. **Source URL correctness**: The `source_url` field matches

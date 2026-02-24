@@ -6,7 +6,8 @@
 **Input**: User description: "An MCP resource that serves Sadhguru's daily
 quote by scraping https://isha.sadhguru.org/en/wisdom/quotes/date/{date}.
 Exposed as a resource template at sadhguru://daily-quote/{date} where
-date follows the source URL format (e.g., february-22-2026). A convenience
+date uses ISO 8601 format (e.g., 2026-02-22). The server internally
+converts to the source URL format (month-day-year). A convenience
 resource sadhguru://daily-quote/today resolves to the current date. Returns
 the quote text with source URL attribution. Responses MUST be cached for
 the duration of the day to avoid redundant requests."
@@ -31,8 +32,8 @@ isha.sadhguru.org.
 
 1. **Given** the MCP server is running, **When** a client reads
    `sadhguru://daily-quote/today`, **Then** it receives the quote text
-   for the current date and a source URL in the format
-   `https://isha.sadhguru.org/en/wisdom/quotes/date/{month}-{day}-{year}`.
+   for the current date (in ISO 8601 format) and a source URL in the
+   format `https://isha.sadhguru.org/en/wisdom/quotes/date/{month}-{day}-{year}`.
 2. **Given** a client reads `sadhguru://daily-quote/today` twice within
    the same calendar day, **When** the second request is made, **Then**
    the response is served from cache without fetching the source again.
@@ -43,7 +44,7 @@ isha.sadhguru.org.
 
 A client requests a Sadhguru quote for a specific date — for example,
 a user's birthday or a memorable occasion. The client reads
-`sadhguru://daily-quote/february-22-2026` and receives that day's quote
+`sadhguru://daily-quote/2026-02-22` and receives that day's quote
 with source attribution.
 
 **Why this priority**: Enables historical access and date-specific
@@ -51,13 +52,13 @@ lookups, which broadens utility beyond just "today." Depends on the
 same fetching and parsing logic as P1.
 
 **Independent Test**: Can be tested by reading
-`sadhguru://daily-quote/february-22-2026` and verifying the returned
+`sadhguru://daily-quote/2026-02-22` and verifying the returned
 quote matches the content at the corresponding source URL.
 
 **Acceptance Scenarios**:
 
 1. **Given** the MCP server is running, **When** a client reads
-   `sadhguru://daily-quote/february-22-2026`, **Then** it receives the
+   `sadhguru://daily-quote/2026-02-22`, **Then** it receives the
    quote text published on that date with the matching source URL.
 2. **Given** a client reads the same date resource multiple times,
    **When** subsequent requests occur within the cache window, **Then**
@@ -77,20 +78,20 @@ the core happy-path functionality. Prevents confusing failures for
 MCP clients.
 
 **Independent Test**: Can be tested by reading a resource with a
-far-future date (e.g., `sadhguru://daily-quote/january-01-2030`) or
+far-future date (e.g., `sadhguru://daily-quote/2030-01-01`) or
 an invalid string (e.g., `sadhguru://daily-quote/not-a-date`) and
 verifying a descriptive error is returned.
 
 **Acceptance Scenarios**:
 
 1. **Given** the MCP server is running, **When** a client reads
-   `sadhguru://daily-quote/january-01-2030` and no quote exists for
+   `sadhguru://daily-quote/2030-01-01` and no quote exists for
    that date, **Then** the system returns an error indicating no quote
    is available for the requested date.
 2. **Given** the MCP server is running, **When** a client reads
    `sadhguru://daily-quote/not-a-date`, **Then** the system returns
    an error indicating the date format is invalid, with the expected
-   format (e.g., "month-day-year like february-22-2026").
+   format (e.g., "yyyy-mm-dd like 2026-02-22").
 
 ---
 
@@ -112,8 +113,9 @@ verifying a descriptive error is returned.
 ### Functional Requirements
 
 - **FR-001**: System MUST expose an MCP resource template at
-  `sadhguru://daily-quote/{date}` where `{date}` follows the format
-  `month-day-year` (e.g., `february-22-2026`).
+  `sadhguru://daily-quote/{date}` where `{date}` follows ISO 8601
+  format `yyyy-mm-dd` (e.g., `2026-02-22`). The server internally
+  converts to the source website's format for fetching.
 - **FR-002**: System MUST expose a convenience resource at
   `sadhguru://daily-quote/today` that resolves to the current
   calendar date.
@@ -127,15 +129,17 @@ verifying a descriptive error is returned.
   of the calendar day (until midnight) to avoid redundant fetches.
 - **FR-007**: System MUST return a descriptive error when the requested
   date has no published quote or the source is unreachable.
-- **FR-008**: System MUST validate the date parameter format and return
-  a descriptive error with the expected format when invalid.
+- **FR-008**: System MUST validate the date parameter as a valid
+  ISO 8601 date (`yyyy-mm-dd`) and return a descriptive error with
+  the expected format when invalid.
 
 ### Key Entities
 
 - **DailyQuote**: A single Sadhguru quote for a specific date.
-  Attributes: `quote` (the exact quote text), `date` (the date string
-  in month-day-year format), `source_url` (full URL to the source page).
-  Returned as a structured object with these three separate fields.
+  Attributes: `quote` (the exact quote text), `date` (the date in
+  ISO 8601 format, e.g., `2026-02-22`), `source_url` (full URL to
+  the source page). Returned as a structured object with these three
+  separate fields.
 
 ## Success Criteria *(mandatory)*
 
@@ -173,8 +177,8 @@ verifying a descriptive error is returned.
   `https://isha.sadhguru.org/en/wisdom/quotes/date/{date}` is stable
   and publicly accessible without authentication.
 - Each date has at most one quote published.
-- The date format uses lowercase full month names (e.g., "february"
-  not "February" or "feb").
+- The MCP resource accepts dates in ISO 8601 format (`yyyy-mm-dd`).
+  The server converts to the source website's format internally.
 - "Today" is determined by the server's local timezone.
 - Cache is in-memory only; a server restart clears the cache and
   subsequent requests re-fetch from the source.

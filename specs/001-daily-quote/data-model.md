@@ -12,15 +12,17 @@ from the Isha Foundation website.
 | Field | Type | Description | Constraints |
 |-------|------|-------------|-------------|
 | `quote` | `str` | Exact quote text as published | Non-empty; no modification from source |
-| `date` | `str` | Date in `month-day-year` format | Matches pattern `^[a-z]+-\d{1,2}-\d{4}$` |
+| `date` | `str` | Date in ISO 8601 format | Matches pattern `^\d{4}-\d{2}-\d{2}$` and is a valid calendar date |
 | `source_url` | `str` | Full URL to the source page | Valid HTTPS URL on `isha.sadhguru.org` |
 
 **Validation rules**:
 - `quote` must be non-empty after stripping whitespace.
-- `date` must be a valid calendar date in the expected format
-  (lowercase full month name, unpadded day, four-digit year).
-- `source_url` is deterministically derived from `date`:
-  `https://isha.sadhguru.org/en/wisdom/quotes/date/{date}`
+- `date` must be a valid ISO 8601 date (`yyyy-mm-dd`, e.g., `2026-02-22`).
+  Validated via `datetime.date.fromisoformat(date)`.
+- `source_url` is deterministically derived from `date` by converting
+  ISO 8601 to the source website's format:
+  `https://isha.sadhguru.org/en/wisdom/quotes/date/{month}-{day}-{year}`
+  (e.g., `2026-02-22` → `february-22-2026`)
 
 **State transitions**: None. DailyQuote is immutable once fetched.
 
@@ -31,7 +33,7 @@ implementation detail for performance.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `_store` | `dict[str, DailyQuote]` | Date-keyed cache entries |
+| `_store` | `dict[str, DailyQuote]` | ISO date-keyed cache entries (e.g., `"2026-02-22"`) |
 | `_date_key` | `str` | The calendar day the cache was last validated |
 
 **Behavior**:
@@ -62,7 +64,7 @@ resource response:
 ```json
 {
   "quote": "The only way out is in.",
-  "date": "february-24-2026",
+  "date": "2026-02-24",
   "source_url": "https://isha.sadhguru.org/en/wisdom/quotes/date/february-24-2026"
 }
 ```

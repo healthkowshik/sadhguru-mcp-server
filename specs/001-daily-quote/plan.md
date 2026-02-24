@@ -7,7 +7,9 @@
 
 An MCP resource that serves Sadhguru's daily quote by scraping the Isha
 Foundation website. Exposed as `sadhguru://daily-quote/{date}` (resource
-template) and `sadhguru://daily-quote/today` (convenience resource).
+template, accepting ISO 8601 dates like `2026-02-22`) and
+`sadhguru://daily-quote/today` (convenience resource). The server
+converts ISO dates to the source website's format internally.
 Returns structured JSON with `quote`, `date`, and `source_url` fields.
 Responses are cached in-memory per date for the remainder of the calendar day.
 

@@ -79,14 +79,20 @@ persistent across restarts, which matches the spec requirement.
 ## Decision 5: FastMCP Resource Registration
 
 **Decision**: Two `@mcp.resource()` registrations — one resource template
-and one fixed resource.
+and one fixed resource. The `{date}` parameter accepts ISO 8601 format;
+the handler converts to the source website's format internally.
 
 ```python
 @mcp.resource("sadhguru://daily-quote/{date}", mime_type="application/json")
-async def get_daily_quote(date: str) -> str: ...
+async def get_daily_quote(date: str) -> str:
+    # date is ISO 8601 (e.g., "2026-02-22")
+    # Convert to source format (e.g., "february-22-2026") for fetching
+    ...
 
 @mcp.resource("sadhguru://daily-quote/today", mime_type="application/json")
-async def get_todays_quote() -> str: ...
+async def get_todays_quote() -> str:
+    # Resolve today as ISO 8601 via datetime.date.today().isoformat()
+    ...
 ```
 
 **Rationale**: FastMCP distinguishes templates (with `{param}` in URI)
@@ -115,6 +121,15 @@ meaningful feedback.
 - Month: lowercase full name (e.g., `february`)
 - Day: no zero-padding (e.g., `3` not `03`)
 - Year: four digits
+
+**Date conversion**: The MCP resource accepts ISO 8601 dates
+(`yyyy-mm-dd`, e.g., `2026-02-22`). The server converts to the source
+URL format internally:
+```
+2026-02-22 → february-22-2026
+```
+Conversion uses `datetime.date.fromisoformat()` for parsing and
+`date.strftime("%-d")` for unpadded day.
 
 **HTTP behavior**:
 - 200 for valid dates with published quotes

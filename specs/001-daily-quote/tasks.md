@@ -71,9 +71,9 @@
 
 ## Phase 4: User Story 2 — Get Quote by Date (Priority: P2)
 
-**Goal**: A client reads `sadhguru://daily-quote/february-22-2026` and receives that day's quote with source attribution.
+**Goal**: A client reads `sadhguru://daily-quote/2026-02-22` and receives that day's quote with source attribution.
 
-**Independent Test**: Read `sadhguru://daily-quote/february-22-2026` and verify the returned quote matches the source page content.
+**Independent Test**: Read `sadhguru://daily-quote/2026-02-22` and verify the returned quote matches the source page content.
 
 ### Tests for User Story 2
 
@@ -83,8 +83,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement date format validation function (validate `month-day-year` pattern: lowercase full month name, unpadded day 1-31, four-digit year; verify it maps to a valid calendar date) in `src/sadhguru_mcp_server/scraper.py`
-- [ ] T016 [US2] Register `sadhguru://daily-quote/{date}` resource template (validates date, checks cache, calls scraper on miss, returns JSON) in `src/sadhguru_mcp_server/server.py`
+- [ ] T015 [US2] Implement date validation and ISO-to-source conversion function (validate ISO 8601 `yyyy-mm-dd` via `datetime.date.fromisoformat()`, convert to source format `month-day-year` e.g. `2026-02-22` → `february-22-2026`) in `src/sadhguru_mcp_server/scraper.py`
+- [ ] T016 [US2] Register `sadhguru://daily-quote/{date}` resource template (accepts ISO 8601 date, validates, converts to source format, checks cache, calls scraper on miss, returns JSON with ISO date) in `src/sadhguru_mcp_server/server.py`
 - [ ] T017 [US2] Verify contract tests pass (GREEN) — run `uv run pytest tests/contract/test_daily_quote_resource.py`
 
 **Checkpoint**: Both `today` and `{date}` resources are functional. Clients can fetch any valid date.
@@ -95,19 +95,19 @@
 
 **Goal**: Invalid or unavailable date requests return descriptive errors instead of crashing or returning empty content.
 
-**Independent Test**: Read `sadhguru://daily-quote/not-a-date` and `sadhguru://daily-quote/january-01-2030` and verify descriptive error messages are returned.
+**Independent Test**: Read `sadhguru://daily-quote/not-a-date` and `sadhguru://daily-quote/2030-01-01` and verify descriptive error messages are returned.
 
 ### Tests for User Story 3
 
 > **Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T018 [P] [US3] Write failing tests for invalid date format error (e.g., `not-a-date`, `02-22-2026`) — must return error mentioning expected format — in `tests/contract/test_daily_quote_resource.py`
-- [ ] T019 [P] [US3] Write failing tests for unavailable date error (e.g., `january-01-2030`) — must return error indicating no quote available — in `tests/contract/test_daily_quote_resource.py`
+- [ ] T018 [P] [US3] Write failing tests for invalid date format error (e.g., `not-a-date`, `22-02-2026`) — must return error mentioning expected ISO 8601 format — in `tests/contract/test_daily_quote_resource.py`
+- [ ] T019 [P] [US3] Write failing tests for unavailable date error (e.g., `2030-01-01`) — must return error indicating no quote available — in `tests/contract/test_daily_quote_resource.py`
 - [ ] T020 [P] [US3] Write failing tests for upstream errors (network timeout, connection refused) — must return error indicating upstream unavailable — in `tests/unit/test_scraper.py`
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Implement error handling for invalid date format: raise descriptive error with expected format hint in `src/sadhguru_mcp_server/scraper.py`
+- [ ] T021 [US3] Implement error handling for invalid date format: raise descriptive error with expected ISO 8601 format hint in `src/sadhguru_mcp_server/scraper.py`
 - [ ] T022 [US3] Implement error handling for HTTP 404 (no quote for date) and missing quote in parsed HTML in `src/sadhguru_mcp_server/scraper.py`
 - [ ] T023 [US3] Implement error handling for upstream network errors (httpx.ConnectError, httpx.TimeoutException) in `src/sadhguru_mcp_server/scraper.py`
 - [ ] T024 [US3] Verify all error-path tests pass (GREEN) — run `uv run pytest tests/contract/ tests/unit/`
